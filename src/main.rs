@@ -85,11 +85,11 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(client.clone())) // Share the HTTP client across requests
             .route("/health", web::get().to(health_check))
-            .route("/imf-properties/{path}", web::route().to(proxy_properties))
-            .route("/imf-users/{path}", web::route().to(proxy_users))
-            .route("/imf-payments/{path}", web::route().to(proxy_payments))
+            .route("/imf-properties/{path:.*}", web::route().to(proxy_properties))
+            .route("/imf-users/{path:.*}", web::route().to(proxy_users))
+            .route("/imf-payments/{path:.*}", web::route().to(proxy_payments))
             .route(
-                "/imf-appointments/{path}",
+                "/imf-appointments/{path:.*}",
                 web::route().to(proxy_appointments),
             )
     })
