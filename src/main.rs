@@ -20,8 +20,18 @@ async fn proxy_to_service(
     let method = req.method();
     let request_builder: RequestBuilder = match *method {
         Method::GET => client.get(&service_url),
-        Method::POST => client.post(&service_url).body(body.to_vec()),
-        Method::PUT => client.put(&service_url).body(body.to_vec()),
+        Method::POST => {
+            let json_body: Value = serde_json::from_slice(&body)
+                .map_err(actix_web::error::ErrorBadRequest)?;
+            client.post(&service_url).json(&json_body)
+        },
+        Method::PUT => {
+            let json_body: Value = serde_json::from_slice(&body)
+                .map_err(actix_web::error::ErrorBadRequest)?;
+            client
+                .put(&service_url)
+                .json(&json_body)
+        },
         Method::DELETE => client.delete(&service_url),
         _ => return Ok(HttpResponse::MethodNotAllowed().body("Method not supported")),
     };
